@@ -6,6 +6,8 @@ Build/
 
 # Binary version of .rs (resource file)
 *.aps
-/IDE/VS/01_TestInput
 /IDE/VS/Debug
 /CI/appveyor.yml
+/IDE/VS/01_TestInput/Debug
+/IDE/VS/01_TestInput/DisplaySettings.txt
+/IDE/VS/01_TestInput/NetworkSettings.txt
