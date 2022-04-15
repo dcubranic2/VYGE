@@ -274,7 +274,7 @@ void Engine::Run()
 				m_input->Update();
 
 				// Check if the user wants to make a forced exit.
-				if( m_input->GetKeyPress( DIK_F1 ) )
+				if( m_input->GetKeyPress( DIK_F12 ) )
 					PostQuitMessage( 0 );
 
 				// Request the viewer from the current state, if there is one.

@@ -13,6 +13,11 @@
 // DirectInput Version Define
 //-----------------------------------------------------------------------------
 #define DIRECTINPUT_VERSION 0x0800
+#ifdef UNICODE
+#define LPCDIDEVICEINSTANCE  LPCDIDEVICEINSTANCEW
+#else
+#define LPCDIDEVICEINSTANCE  LPCDIDEVICEINSTANCEA
+#endif // !UNICODE
 
 //-----------------------------------------------------------------------------
 // System Includes
