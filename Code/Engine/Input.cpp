@@ -10,32 +10,33 @@
 //-----------------------------------------------------------------------------
 // The input class constructor.
 //-----------------------------------------------------------------------------
-Input::Input( HWND window )
+Input::Input(HWND window)
 {
 	// Store the handle to the parent window.
 	m_window = window;
 
 	// Create a DirectInput interface.
-	DirectInput8Create( GetModuleHandle( NULL ), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_di, NULL );
+	DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_di, NULL);
 
 	// Create, prepare, and aquire the keyboard device.
-	m_di->CreateDevice( GUID_SysKeyboard, &m_keyboard, NULL );
-	m_keyboard->SetDataFormat( &c_dfDIKeyboard );
-	m_keyboard->SetCooperativeLevel( m_window, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE );
+	m_di->CreateDevice(GUID_SysKeyboard, &m_keyboard, NULL);
+	m_keyboard->SetDataFormat(&c_dfDIKeyboard);
+	m_keyboard->SetCooperativeLevel(m_window, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	m_keyboard->Acquire();
 
 	// Create, prepare, and aquire the mouse device.
-	m_di->CreateDevice( GUID_SysMouse, &m_mouse, NULL );
-	m_mouse->SetDataFormat( &c_dfDIMouse );
-	m_mouse->SetCooperativeLevel( m_window, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE );
+	m_di->CreateDevice(GUID_SysMouse, &m_mouse, NULL);
+	m_mouse->SetDataFormat(&c_dfDIMouse);
+	m_mouse->SetCooperativeLevel(m_window, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	m_mouse->Acquire();
 
-	m_di->EnumDevices( DI8DEVCLASS_GAMECTRL, Input::EnumGamepads, &m_gamepadGUID, DIEDFL_ATTACHEDONLY);
+	m_di->EnumDevices(DI8DEVCLASS_GAMECTRL, Input::EnumGamepads, &m_gamepadGUID, DIEDFL_ATTACHEDONLY);
 	HRESULT hr = m_di->CreateDevice(m_gamepadGUID, &m_gamepad, NULL);
 	if (!FAILED(hr))
 	{
 		m_gamepad->SetDataFormat(&c_dfDIJoystick);
 		m_gamepad->SetCooperativeLevel(m_window, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		m_gamepad->EnumObjects(Input::EnumGamepadObjects, m_gamepad, DIDFT_AXIS);
 		m_gamepad->Acquire();
 	}
 	// Start the press stamp.
@@ -47,19 +48,19 @@ Input::Input( HWND window )
 //-----------------------------------------------------------------------------
 Input::~Input()
 {
-	if( m_keyboard )
+	if (m_keyboard)
 		m_keyboard->Unacquire();
-	SAFE_RELEASE( m_keyboard );
+	SAFE_RELEASE(m_keyboard);
 
-	if( m_mouse )
+	if (m_mouse)
 		m_mouse->Unacquire();
-	SAFE_RELEASE( m_mouse );
+	SAFE_RELEASE(m_mouse);
 
 	if (m_gamepad)
 		m_gamepad->Unacquire();
 	SAFE_RELEASE(m_gamepad);
 
-	SAFE_RELEASE( m_di);
+	SAFE_RELEASE(m_di);
 }
 
 //-----------------------------------------------------------------------------
@@ -70,36 +71,36 @@ void Input::Update()
 	static HRESULT result;
 
 	// Poll the keyboard until it succeeds or returns an unknown error.
-	while( true )
+	while (true)
 	{
 		m_keyboard->Poll();
-		if( SUCCEEDED( result = m_keyboard->GetDeviceState( 256, (LPVOID)&m_keyState ) ) )
+		if (SUCCEEDED(result = m_keyboard->GetDeviceState(256, (LPVOID)&m_keyState)))
 			break;
-		if( result != DIERR_INPUTLOST && result != DIERR_NOTACQUIRED )
+		if (result != DIERR_INPUTLOST && result != DIERR_NOTACQUIRED)
 			return;
 
 		// Reacquire the device if the focus was lost.
-		if( FAILED( m_keyboard->Acquire() ) )
+		if (FAILED(m_keyboard->Acquire()))
 			return;
 	}
 
 	// Poll the mouse until it succeeds or returns an unknown error.
-	while( true )
+	while (true)
 	{
 		m_mouse->Poll();
-		if( SUCCEEDED( result = m_mouse->GetDeviceState( sizeof( DIMOUSESTATE ), &m_mouseState ) ) )
+		if (SUCCEEDED(result = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), &m_mouseState)))
 			break;
-		if( result != DIERR_INPUTLOST && result != DIERR_NOTACQUIRED )
+		if (result != DIERR_INPUTLOST && result != DIERR_NOTACQUIRED)
 			return;
 
 		// Reacquire the device if the focus was lost.
-		if( FAILED( m_mouse->Acquire() ) )
+		if (FAILED(m_mouse->Acquire()))
 			return;
 	}
 
 	// Get the relative position of the mouse.
-	GetCursorPos( &m_position );
-	ScreenToClient( m_window, &m_position );
+	GetCursorPos(&m_position);
+	ScreenToClient(m_window, &m_position);
 
 	// Poll the gamepad until it succeeds or returns an unknown error.
 	while (m_gamepad)
@@ -123,15 +124,15 @@ void Input::Update()
 // Returns true if the given key is pressed.
 // Note: Consistent presses will return false when using the press stamp.
 //-----------------------------------------------------------------------------
-bool Input::GetKeyPress( char key, bool ignorePressStamp )
+bool Input::GetKeyPress(char key, bool ignorePressStamp)
 {
-	if( ( m_keyState[key] & 0x80 ) == false )
+	if ((m_keyState[key] & 0x80) == false)
 		return false;
 
 	bool pressed = true;
 
-	if( ignorePressStamp == false )
-		if( m_keyPressStamp[key] == m_pressStamp - 1 || m_keyPressStamp[key] == m_pressStamp )
+	if (ignorePressStamp == false)
+		if (m_keyPressStamp[key] == m_pressStamp - 1 || m_keyPressStamp[key] == m_pressStamp)
 			pressed = false;
 
 	m_keyPressStamp[key] = m_pressStamp;
@@ -143,15 +144,15 @@ bool Input::GetKeyPress( char key, bool ignorePressStamp )
 // Returns true if the given button is pressed.
 // Note: Consistent presses will return false when using the press stamp.
 //-----------------------------------------------------------------------------
-bool Input::GetButtonPress( char button, bool ignorePressStamp )
+bool Input::GetButtonPress(char button, bool ignorePressStamp)
 {
-	if( ( m_mouseState.rgbButtons[button] & 0x80 ) == false )
+	if ((m_mouseState.rgbButtons[button] & 0x80) == false)
 		return false;
 
 	bool pressed = true;
 
-	if( ignorePressStamp == false )
-		if( m_buttonPressStamp[button] == m_pressStamp - 1 || m_buttonPressStamp[button] == m_pressStamp )
+	if (ignorePressStamp == false)
+		if (m_buttonPressStamp[button] == m_pressStamp - 1 || m_buttonPressStamp[button] == m_pressStamp)
 			pressed = false;
 
 	m_buttonPressStamp[button] = m_pressStamp;
@@ -201,8 +202,8 @@ long Input::GetDeltaWheel()
 
 long Input::GetGamePadJoy1PosX()
 {
-	long state=0;
-	if(m_gamepad)
+	long state = 0;
+	if (m_gamepad)
 		state = m_gamepadState.lX;
 	return state;
 }
@@ -250,7 +251,7 @@ long Input::GetGamePadSliderRight()
 bool Input::GetGamePadDPadPosUp()
 {
 	DWORD state = 0;
-	if ( m_gamepad && m_gamepadState.rgdwPOV[0] == 0 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 0)
 		state = 1;
 	return state;
 }
@@ -258,7 +259,7 @@ bool Input::GetGamePadDPadPosUp()
 bool Input::GetGamePadDPadPosDown()
 {
 	DWORD state = 0;
-	if ( m_gamepad && m_gamepadState.rgdwPOV[0] == 18000 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 18000)
 		state = 1;
 	return state;
 }
@@ -266,7 +267,7 @@ bool Input::GetGamePadDPadPosDown()
 bool Input::GetGamePadDPadPosLeft()
 {
 	DWORD state = 0;
-	if ( m_gamepad && m_gamepadState.rgdwPOV[0] == 27000 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 27000)
 		state = 1;
 	return state;
 }
@@ -274,7 +275,7 @@ bool Input::GetGamePadDPadPosLeft()
 bool Input::GetGamePadDPadPosRight()
 {
 	DWORD state = 0;
-	if ( m_gamepad && m_gamepadState.rgdwPOV[0] == 9000 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 9000)
 		state = 1;
 	return state;
 }
@@ -282,7 +283,7 @@ bool Input::GetGamePadDPadPosRight()
 bool Input::GetGamePadDPadPosUpLeft()
 {
 	DWORD state = 0;
-	if ( m_gamepad && m_gamepadState.rgdwPOV[0] == 31500 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 31500)
 		state = 1;
 	return state;
 }
@@ -290,7 +291,7 @@ bool Input::GetGamePadDPadPosUpLeft()
 bool Input::GetGamePadDPadPosUpRight()
 {
 	DWORD state = 0;
-	if  ( m_gamepad && m_gamepadState.rgdwPOV[0] == 4500 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 4500)
 		state = 1;
 	return state;
 }
@@ -298,7 +299,7 @@ bool Input::GetGamePadDPadPosUpRight()
 bool Input::GetGamePadDPadPosDownLeft()
 {
 	DWORD state = 0;
-	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 22500 )
+	if (m_gamepad && m_gamepadState.rgdwPOV[0] == 22500)
 		state = 1;
 	return state;
 }
@@ -336,9 +337,32 @@ bool Input::GetGamePadButtonPress(char button, bool ignorePressStamp)
 /// <param name="lpddi">pointer to device instance</param>
 /// <param name="pvRef">pointer to custom data</param>
 /// <returns>DIENUM_STOP ili DIENUM_CONTINUE</returns>
-BOOL CALLBACK Input::EnumGamepads( LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
+BOOL CALLBACK Input::EnumGamepads(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
-	GUID xtemp=lpddi->guidInstance;
+	GUID xtemp = lpddi->guidInstance;
 	memcpy_s(pvRef, sizeof(GUID), &xtemp, sizeof(GUID));
 	return DIENUM_STOP;
+}
+/// <summary>
+/// Enumerator to game pad objects
+/// </summary>
+/// <param name="lpddoi">pointer to device objects instance</param>
+/// <param name="self">pointer to custom data</param>
+/// <returns>DIENUM_STOP ili DIENUM_CONTINUE</returns>
+BOOL CALLBACK Input::EnumGamepadObjects(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID self)
+{
+	if ((lpddoi->dwType & DIDFT_AXIS) != 0)
+	{
+		DIPROPRANGE range;
+		range.diph.dwSize = sizeof(DIPROPRANGE);
+		range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+		range.diph.dwHow = DIPH_BYID;
+		range.diph.dwObj = lpddoi->dwType;
+		range.lMin = -5000;
+		range.lMax = 5000;
+		IDirectInputDevice8* didevice = (IDirectInputDevice8*)self;
+		if (didevice->SetProperty(DIPROP_RANGE, &range.diph) != DI_OK)
+			assert("Error: Set GamePad Axes Range");
+	}
+	return DIENUM_CONTINUE;
 }

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <windowsx.h>
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 // DirectX Includes

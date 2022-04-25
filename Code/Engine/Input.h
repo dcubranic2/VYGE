@@ -65,6 +65,7 @@ private:
 	DIJOYSTATE m_gamepadState;
 	unsigned long m_gamepadButtonPressStamp[32];
 	static BOOL CALLBACK EnumGamepads( LPCDIDEVICEINSTANCE lpDIDE, LPVOID self );
+	static BOOL CALLBACK EnumGamepadObjects( LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID self );
  
 };
 
