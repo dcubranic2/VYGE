@@ -470,7 +470,7 @@ HRESULT WINAPI Network::NetworkMessageHandler( PVOID context, DWORD msgid, PVOID
 				char buffer[MAX_PATH];
 				int size = sizeof(buffer);
 				sessionInfo->address->GetURLA(buffer, (PDWORD)&size);
-				xscript->AddVariable("Direct Play URLA", VARIABLE_STRING, buffer);
+				xscript->AddVariable("Direct_Play_URLA", VARIABLE_STRING, buffer);
 				xscript->SaveScript();
 				SAFE_DELETE(xscript);
 			}
