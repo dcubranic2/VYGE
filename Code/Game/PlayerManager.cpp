@@ -127,7 +127,7 @@ void PlayerManager::Update( float elapsed )
 		desiredStrafe = -1.0;
 
 	// Check if the local player is trying to fire their weapon.
-	desiredFire = g_engine->GetInput()->GetButtonPress( 0, true );
+	desiredFire = g_engine->GetInput()->GetButtonPress( 0, true ) || g_engine->GetInput()->GetKeyPress(DIK_SPACE, true);
 
 	// Check if we need to drive the local player.
 	if( m_localDrive != desiredDrive )

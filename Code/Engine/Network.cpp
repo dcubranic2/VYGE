@@ -62,7 +62,9 @@ Network::Network( GUID guid, void (*HandleNetworkMessageFunction)( ReceivedMessa
 	// Create the device address.
 	CoCreateInstance( CLSID_DirectPlay8Address, NULL, CLSCTX_INPROC, IID_IDirectPlay8Address, (LPVOID*) &m_device );
 	m_device->SetSP( &CLSID_DP8SP_TCPIP );
-	m_device->AddComponent( DPNA_KEY_PORT, &m_port, sizeof(DWORD), DPNA_DATATYPE_DWORD );
+
+	// Removed otherwise client and server cannont be on the same computer
+	// m_device->AddComponent( DPNA_KEY_PORT, &m_port, sizeof(DWORD), DPNA_DATATYPE_DWORD );
 }
 
 //-----------------------------------------------------------------------------
@@ -462,6 +464,16 @@ HRESULT WINAPI Network::NetworkMessageHandler( PVOID context, DWORD msgid, PVOID
 			SessionInfo *sessionInfo = new SessionInfo;
 			response->pAddressSender->Duplicate( &sessionInfo->address );
 			memcpy( &sessionInfo->description, response->pApplicationDescription, sizeof( DPN_APPLICATION_DESC ) );
+
+			if (_DEBUG) {
+				Script* xscript = new Script("Debug.txt");
+				char buffer[MAX_PATH];
+				int size = sizeof(buffer);
+				sessionInfo->address->GetURLA(buffer, (PDWORD)&size);
+				xscript->AddVariable("Direct Play URLA", VARIABLE_STRING, buffer);
+				xscript->SaveScript();
+				SAFE_DELETE(xscript);
+			}
 
 			// Add the new session to the session list.
 			EnterCriticalSection( &network->m_sessionCS );
