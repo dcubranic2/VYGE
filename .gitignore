@@ -13,3 +13,5 @@ Build/
 /IDE/VS/01_TestInput/NetworkSettings.txt
 /IDE/VS/IncludeFileDependencies1.dgml
 /IDE/VS/Game/DisplaySettings.txt
+/IDE/VS/02_TestModel/Debug
+/IDE/VS/02_TestModel/02_TestModel.exe

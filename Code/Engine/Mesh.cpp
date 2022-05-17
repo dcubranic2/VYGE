@@ -515,6 +515,7 @@ void Mesh::RenderFrame( Frame *frame )
 					g_engine->GetDevice()->SetTexture( 0, NULL );
 
 				meshContainer->MeshData.pMesh->DrawSubset( m );
+				g_engine->GetDevice()->SetTransform(D3DTS_WORLD, &frame->finalTransformationMatrix);
 			}
 		}
 	}
